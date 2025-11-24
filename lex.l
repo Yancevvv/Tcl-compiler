@@ -1,20 +1,19 @@
 %option noyywrap
-%option never-interactive
 %option yylineno
 
 %{
 #define YY_NO_UNISTD_H
+#include "parser.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "utils.h"
-#include "parser.tab.h"
 
+extern int in_control_context;
 void remove_underscores(char* str);
 
-/* Глобальные переменные состояния для строк */
-char string_buffer[1000];
+char string_buffer[1024];
 int brace_count = 0;
 %}
 
@@ -25,25 +24,25 @@ BIN_DIGIT   [01]
 ID          [a-zA-Z_][a-zA-Z0-9_]*
 WHITESPACE  [ \t\r]
 
-%x DOUBLE_QUOTES BRACES BRACKETS
+%x DOUBLE_QUOTES BRACED_STRING BRACKETS
 
 %%
 
-{WHITESPACE}+   { /* Skip whitespace */ }
+{WHITESPACE}+   { /* skip whitespace */ }
 \n              { return NEWLINE; }
-#.*             { /* Skip comments */ }
+#.*             { /* skip comments */ }
 
-"if"            { return IF; }
+"if"            { in_control_context = 1; return IF; }
 "else"          { return ELSE; }
-"elseif"        { return ELSEIF; }
-"while"         { return WHILE; }
-"for"           { return FOR; }
-"foreach"       { return FOREACH; }
+"elseif"        { in_control_context = 1; return ELSEIF; }
+"while"         { in_control_context = 1; return WHILE; }
+"for"           { in_control_context = 1; return FOR; }
+"foreach"       { in_control_context = 1; return FOREACH; }
 "proc"          { return PROC; }
 "return"        { return RETURN; }
 "set"           { return SET; }
-"expr"          { return EXPR; }
-"switch"        { return SWITCH; }
+"expr"          { in_control_context = 1; return EXPR; }
+"switch"        { in_control_context = 1; return SWITCH; }
 "break"         { return BREAK; }
 "continue"      { return CONTINUE; }
 "in"            { return IN; }
@@ -103,17 +102,6 @@ WHITESPACE  [ \t\r]
 "."             { return DOT; }
 ":"             { return COLON; }
 
-"{"             { 
-    string_buffer[0] = '\0';
-    brace_count = 1;
-    BEGIN(BRACES);
-}
-"}"             { 
-    /* Одиночная закрывающая скобка - ошибка в обычном режиме */
-    fprintf(stderr, "ERROR: Unexpected '}'\n");
-    return ERROR;
-}
-
 0[bB]{BIN_DIGIT}+(_?{BIN_DIGIT}+)* {
     char temp[100];
     strcpy(temp, yytext + 2);
@@ -171,48 +159,87 @@ WHITESPACE  [ \t\r]
 "inf"|"Inf"|"INF" { yylval.double_val = get_infinity(); return DOUBLE; }
 "nan"|"NaN"|"NAN" { yylval.double_val = get_nan(); return DOUBLE; }
 
+"{" {
+    if (in_control_context) {
+        brace_count = 1;
+        return LBRACE;  // парсить как блок кода
+    } else {
+        // Обычная braced-строка
+        string_buffer[0] = '\0';
+        brace_count = 1;
+        BEGIN(BRACED_STRING);
+    }
+}
+
+"}" {
+    if (in_control_context) {
+        brace_count--;
+        if (brace_count == 0) {
+            in_control_context = 0;
+        }
+        return RBRACE;
+    } else {
+        fprintf(stderr, "ERROR: unexpected '}'\n");
+        return ERROR;
+    }
+}
+
 \" {
     string_buffer[0] = '\0';
     BEGIN(DOUBLE_QUOTES);
 }
 
-<DOUBLE_QUOTES>[^"\\]+ {
-    strcat(string_buffer, yytext);
-}
-
-<DOUBLE_QUOTES>\\. {
-    switch(yytext[1]) {
-        case 'n': strcat(string_buffer, "\n"); break;
-        case 't': strcat(string_buffer, "\t"); break;
-        case 'r': strcat(string_buffer, "\r"); break;
-        case '\\': strcat(string_buffer, "\\"); break;
-        case '"': strcat(string_buffer, "\""); break;
-        default: strcat(string_buffer, yytext); break;
+<DOUBLE_QUOTES>{
+    /* Сначала обрабатываем специальные последовательности */
+    \\. {
+        switch(yytext[1]) {
+            case 'n': strcat(string_buffer, "\n"); break;
+            case 't': strcat(string_buffer, "\t"); break;
+            case 'r': strcat(string_buffer, "\r"); break;
+            case '\\': strcat(string_buffer, "\\"); break;
+            case '"': strcat(string_buffer, "\""); break;
+            case '$': strcat(string_buffer, "$"); break;
+            default: strcat(string_buffer, yytext); break;
+        }
+    }
+    
+    /* Затем переменные - до обычных символов */
+    \$[a-zA-Z_][a-zA-Z0-9_]* {
+        strcat(string_buffer, yytext);
+    }
+    
+    \$\{[^}]+\} {
+        strcat(string_buffer, yytext);
+    }
+    
+    /* Обычные символы (исключая ", \ и $) */
+    [^"\\$]+ {
+        strcat(string_buffer, yytext);
+    }
+    
+    \" {
+        yylval.string_val = strdup(string_buffer);
+        BEGIN(INITIAL);
+        return STRING;
+    }
+    
+    <<EOF>> {
+        fprintf(stderr, "ERROR: Unclosed double-quoted string\n");
+        BEGIN(INITIAL);
+        return ERROR;
     }
 }
 
-<DOUBLE_QUOTES>\" {
-    yylval.string_val = strdup(string_buffer);
-    BEGIN(INITIAL);
-    return STRING;
-}
-
-<DOUBLE_QUOTES><<EOF>> {
-    fprintf(stderr, "ERROR: Unclosed double-quoted string\n");
-    BEGIN(INITIAL);
-    return ERROR;
-}
-
-<BRACES>[^{}]+ {
+<BRACED_STRING>[^{}]+ {
     strcat(string_buffer, yytext);
 }
 
-<BRACES>"{" {
+<BRACED_STRING>"{" {
     brace_count++;
     strcat(string_buffer, "{");
 }
 
-<BRACES>"}" {
+<BRACED_STRING>"}" {
     brace_count--;
     if (brace_count == 0) {
         yylval.string_val = strdup(string_buffer);
@@ -223,7 +250,7 @@ WHITESPACE  [ \t\r]
     }
 }
 
-<BRACES><<EOF>> {
+<BRACED_STRING><<EOF>> {
     fprintf(stderr, "ERROR: Unclosed braced string\n");
     BEGIN(INITIAL);
     return ERROR;
@@ -290,4 +317,10 @@ void remove_underscores(char* str) {
         src++;
     }
     *dst = '\0';
+}
+
+int in_control_context = 0;
+
+void set_control_context(int ctx) {
+    in_control_context = ctx;
 }

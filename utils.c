@@ -1,4 +1,8 @@
 #include "utils.h"
+#include "parser.tab.h"
+
+/* Определение yylval */
+YYSTYPE yylval;
 
 double get_infinity(void) {
     return HUGE_VAL;
