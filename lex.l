@@ -12,6 +12,7 @@
 
 extern int in_control_context;
 void remove_underscores(char* str);
+int is_valid_number_format(const char* s);
 
 char string_buffer[1024];
 int brace_count = 0;
@@ -30,7 +31,8 @@ WHITESPACE  [ \t\r]
 
 {WHITESPACE}+   { /* skip whitespace */ }
 \n              { return NEWLINE; }
-#.*             { /* skip comments */ }
+#.* { printf("Comment: %s\n", yytext + 1); }
+
 
 "if"            { in_control_context = 1; return IF; }
 "else"          { return ELSE; }
@@ -102,58 +104,76 @@ WHITESPACE  [ \t\r]
 "."             { return DOT; }
 ":"             { return COLON; }
 
-0[bB]{BIN_DIGIT}+(_?{BIN_DIGIT}+)* {
-    char temp[100];
+{DIGIT}(_?{DIGIT})* {
+    if (!is_valid_number_format(yytext)) {
+        fprintf(stderr, "ERROR: invalid decimal number: %s\n", yytext);
+        return ERROR;
+    }
+    char temp[256];
+    strcpy(temp, yytext);
+    remove_underscores(temp);
+    yylval.int_val = atoi(temp);
+    return INTEGER;
+}
+
+0[bB]{BIN_DIGIT}(_?{BIN_DIGIT})* {
+    if (!is_valid_number_format(yytext + 2)) {
+        fprintf(stderr, "ERROR: invalid binary number: %s\n", yytext);
+        return ERROR;
+    }
+    char temp[256];
     strcpy(temp, yytext + 2);
     remove_underscores(temp);
     yylval.int_val = strtol(temp, NULL, 2);
     return INTEGER;
 }
 
-0[oO]?{OCT_DIGIT}+(_?{OCT_DIGIT}+)* {
-    char temp[100];
-    char* start = yytext;
-    if (yytext[1] == 'o' || yytext[1] == 'O') {
-        start += 2;
-    } else {
-        start += 1;
+0[oO]{OCT_DIGIT}(_?{OCT_DIGIT})* {
+    if (!is_valid_number_format(yytext + 2)) {
+        fprintf(stderr, "ERROR: invalid octal number (0o/0O): %s\n", yytext);
+        return ERROR;
     }
-    strcpy(temp, start);
+    char temp[256];
+    strcpy(temp, yytext + 2);
     remove_underscores(temp);
     yylval.int_val = strtol(temp, NULL, 8);
     return INTEGER;
 }
 
-0[xX]{HEX_DIGIT}+(_?{HEX_DIGIT}+)* {
-    char temp[100];
+0[xX]{HEX_DIGIT}(_?{HEX_DIGIT})* {
+    if (!is_valid_number_format(yytext + 2)) {
+        fprintf(stderr, "ERROR: invalid hex number: %s\n", yytext);
+        return ERROR;
+    }
+    char temp[256];
     strcpy(temp, yytext + 2);
     remove_underscores(temp);
     yylval.int_val = strtol(temp, NULL, 16);
     return INTEGER;
 }
 
-{DIGIT}+\.{DIGIT}*([eE][+-]?{DIGIT}+)? {
-    char temp[100];
+{DIGIT}(_?{DIGIT})*\.{DIGIT}(_?{DIGIT})* {
+    if (!is_valid_number_format(yytext)) {
+        fprintf(stderr, "ERROR: invalid float number: %s\n", yytext);
+        return ERROR;
+    }
+    char temp[256];
     strcpy(temp, yytext);
     remove_underscores(temp);
     yylval.double_val = atof(temp);
     return DOUBLE;
 }
 
-{DIGIT}+[eE][+-]?{DIGIT}+ {
-    char temp[100];
+{DIGIT}(_?{DIGIT})*(\.{DIGIT}(_?{DIGIT})*)?[eE][+-]?{DIGIT}(_?{DIGIT})* {
+    if (!is_valid_number_format(yytext)) {
+        fprintf(stderr, "ERROR: invalid float with exponent: %s\n", yytext);
+        return ERROR;
+    }
+    char temp[256];
     strcpy(temp, yytext);
     remove_underscores(temp);
     yylval.double_val = atof(temp);
     return DOUBLE;
-}
-
-{DIGIT}+(_?{DIGIT}+)* {
-    char temp[100];
-    strcpy(temp, yytext);
-    remove_underscores(temp);
-    yylval.int_val = atoi(temp);
-    return INTEGER;
 }
 
 "inf"|"Inf"|"INF" { yylval.double_val = get_infinity(); return DOUBLE; }
@@ -189,45 +209,56 @@ WHITESPACE  [ \t\r]
     BEGIN(DOUBLE_QUOTES);
 }
 
-<DOUBLE_QUOTES>{
-    /* Сначала обрабатываем специальные последовательности */
-    \\. {
-        switch(yytext[1]) {
-            case 'n': strcat(string_buffer, "\n"); break;
-            case 't': strcat(string_buffer, "\t"); break;
-            case 'r': strcat(string_buffer, "\r"); break;
-            case '\\': strcat(string_buffer, "\\"); break;
-            case '"': strcat(string_buffer, "\""); break;
-            case '$': strcat(string_buffer, "$"); break;
-            default: strcat(string_buffer, yytext); break;
+
+<DOUBLE_QUOTES>[^"\\$]+ {
+    strcat(string_buffer, yytext);
+}
+
+<DOUBLE_QUOTES>\\. {
+    switch(yytext[1]) {
+        case 'n': strcat(string_buffer, "\n"); break;
+        case 't': strcat(string_buffer, "\t"); break;
+        case 'r': strcat(string_buffer, "\r"); break;
+        case '\\': strcat(string_buffer, "\\"); break;
+        case '"': strcat(string_buffer, "\""); break;
+		case 'u': {
+            // Проверяем, что за u идут 4 шестнадцатиричных символа
+            if (strlen(yytext) >= 6) { // uXXXX
+                char hex[5];
+                strncpy(hex, &yytext[2], 4);
+                hex[4] = '0'; // Завершаем строку
+
+                // Преобразуем шестнадцатиричное значение в символ
+                wchar_t unicode_char = (wchar_t)strtol(hex, NULL, 16);
+                // Преобразуем в строку и добавляем в buffer
+                char mb_char[4];
+                int len = wctomb(mb_char, unicode_char);
+                if (len > 0) {
+                    mb_char[len] = '0'; // Завершаем строку
+                    strcat(string_buffer, mb_char);
+                }
+            }
+            break;
         }
+        default: strcat(string_buffer, yytext); break;
     }
-    
-    /* Затем переменные - до обычных символов */
-    \$[a-zA-Z_][a-zA-Z0-9_]* {
-        strcat(string_buffer, yytext);
-    }
-    
-    \$\{[^}]+\} {
-        strcat(string_buffer, yytext);
-    }
-    
-    /* Обычные символы (исключая ", \ и $) */
-    [^"\\$]+ {
-        strcat(string_buffer, yytext);
-    }
-    
-    \" {
-        yylval.string_val = strdup(string_buffer);
-        BEGIN(INITIAL);
-        return STRING;
-    }
-    
-    <<EOF>> {
-        fprintf(stderr, "ERROR: Unclosed double-quoted string\n");
-        BEGIN(INITIAL);
-        return ERROR;
-    }
+}
+
+<DOUBLE_QUOTES>\$[a-zA-Z_][a-zA-Z0-9_]* {
+    // переменные: просто копируем как текст
+    strcat(string_buffer, yytext);
+}
+
+<DOUBLE_QUOTES>\" {
+    yylval.string_val = strdup(string_buffer);
+    BEGIN(INITIAL);
+    return STRING;
+}
+
+<DOUBLE_QUOTES><<EOF>> {
+    fprintf(stderr, "ERROR: Unclosed double-quoted string\n");
+    BEGIN(INITIAL);
+    return ERROR;
 }
 
 <BRACED_STRING>[^{}]+ {
@@ -323,4 +354,14 @@ int in_control_context = 0;
 
 void set_control_context(int ctx) {
     in_control_context = ctx;
+}
+
+int is_valid_number_format(const char* s) {
+    int len = strlen(s);
+    if (len == 0) return 0;
+    // Нельзя начинать или заканчивать на _
+    if (s[0] == '_' || s[len-1] == '_') return 0;
+    // Нельзя иметь __
+    if (strstr(s, "__")) return 0;
+    return 1;
 }
