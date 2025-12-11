@@ -42,12 +42,20 @@ void yyerror(const char* s);
 %type <string_val> string_expr
 %type <string_val> block
 
-%left OR
+/* ВАЖНО: Приоритеты операторов для разрешения конфликтов */
+%left DOT              /* Левая ассоциативность для конкатенации строк */
+%left OR               /* Самый низкий приоритет */
 %left AND
+%right NOT             /* Правая ассоциативность для унарного NOT */
+%left EQ NE LT GT LE GE STREQ STRNE
 %left PLUS MINUS
 %left MULT DIV
 %right POW
 %right UNARY_MINUS
+
+/* Разрешение "dangling else" конфликта */
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE ELSEIF
 
 %start program
 
@@ -128,14 +136,16 @@ control_statement:
     if_statement
     | while_statement
     | for_statement
+    | foreach_statement
     | proc_definition
     | return_statement
     | break_statement
     | continue_statement
     ;
 
+/* Исправленные правила if_statement с явным приоритетом */
 if_statement:
-    IF boolean_expr block { printf("If statement\n"); }
+    IF boolean_expr block %prec LOWER_THAN_ELSE { printf("If statement\n"); }
     | IF boolean_expr block ELSE block { printf("If-Else statement\n"); }
     | IF boolean_expr block ELSEIF boolean_expr block { printf("If-ElseIf statement\n"); }
     ;
@@ -148,6 +158,7 @@ for_statement:
     FOR LPAREN assignment SEMICOLON boolean_expr SEMICOLON assignment RPAREN block { printf("For loop\n"); }
     ;
 
+/* Теперь foreach_statement используется */
 foreach_statement:
     FOREACH VARIABLE IN VARIABLE block { printf("Foreach loop\n"); free($2); free($4); }
     ;
@@ -196,6 +207,7 @@ int main(int argc, char* argv[]) {
             fprintf(stderr, "Cannot open file: %s\n", argv[1]);
             return 1;
         }
+        extern FILE* yyin;
         yyin = input;
     }
     
