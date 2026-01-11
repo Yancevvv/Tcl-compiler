@@ -113,11 +113,9 @@ extern int yydebug;
     ERROR = 314,                   /* ERROR  */
     CASE = 315,                    /* CASE  */
     DEFAULT = 316,                 /* DEFAULT  */
-    UNARY_BITNOT = 317,            /* UNARY_BITNOT  */
-    UNARY_BITAND = 318,            /* UNARY_BITAND  */
-    UNARY_MINUS = 319,             /* UNARY_MINUS  */
-    UNARY_PLUS = 320,              /* UNARY_PLUS  */
-    LOWER_THAN_ELSE = 321          /* LOWER_THAN_ELSE  */
+    UNARY_MINUS = 317,             /* UNARY_MINUS  */
+    UNARY_PLUS = 318,              /* UNARY_PLUS  */
+    LOWER_THAN_ELSE = 319          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -126,20 +124,20 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "parser.y"
+#line 23 "parser.y"
 
     int int_val;
     double double_val;
     char* string_val;
-    expr_struct* expr_un;
-    stmt_struct* stmt_un;
-    stmt_list_struct* stmt_list_un;
-    expr_list_struct* expr_list_un;
-    elsif_list_struct* elsif_list_un;
-    param_list_struct* param_list_un;
-    program_struct* program_un;
+    void* expr_un;
+    void* stmt_un;
+    void* stmt_list_un;
+    void* expr_list_un;
+    void* elsif_list_un;
+    void* param_list_un;
+    void* program_un;
 
-#line 143 "parser.tab.h"
+#line 141 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

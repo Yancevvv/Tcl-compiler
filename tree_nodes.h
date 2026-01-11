@@ -4,6 +4,16 @@
 
 #include <stdlib.h>
 
+typedef enum {
+    OP_PLUS, OP_MINUS, OP_MULT, OP_DIV, OP_MOD, OP_POW,
+    OP_EQ, OP_NE, OP_LT, OP_GT, OP_LE, OP_GE,
+    OP_STREQ, OP_STRNE,
+    OP_AND, OP_OR, OP_NOT,
+    OP_BITAND, OP_BITOR, OP_BITXOR,
+    OP_LSHIFT, OP_RSHIFT,
+    OP_DOT
+} op_type;
+
 /* Типы выражений */
 typedef enum {
     EXPR_INTEGER,
