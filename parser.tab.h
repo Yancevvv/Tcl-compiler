@@ -61,69 +61,63 @@ extern int yydebug;
     COMMAND = 262,                 /* COMMAND  */
     VARIABLE = 263,                /* VARIABLE  */
     IDENTIFIER = 264,              /* IDENTIFIER  */
-    IF = 265,                      /* IF  */
-    ELSE = 266,                    /* ELSE  */
-    ELSEIF = 267,                  /* ELSEIF  */
-    WHILE = 268,                   /* WHILE  */
-    FOR = 269,                     /* FOR  */
-    FOREACH = 270,                 /* FOREACH  */
-    PROC = 271,                    /* PROC  */
-    RETURN = 272,                  /* RETURN  */
-    SET = 273,                     /* SET  */
-    EXPR = 274,                    /* EXPR  */
-    SWITCH = 275,                  /* SWITCH  */
-    BREAK = 276,                   /* BREAK  */
-    CONTINUE = 277,                /* CONTINUE  */
-    IN = 278,                      /* IN  */
-    FUNC_ABS = 279,                /* FUNC_ABS  */
-    FUNC_SIN = 280,                /* FUNC_SIN  */
-    FUNC_COS = 281,                /* FUNC_COS  */
-    FUNC_TAN = 282,                /* FUNC_TAN  */
-    FUNC_EXP = 283,                /* FUNC_EXP  */
-    FUNC_LOG = 284,                /* FUNC_LOG  */
-    FUNC_SQRT = 285,               /* FUNC_SQRT  */
-    FUNC_RAND = 286,               /* FUNC_RAND  */
-    FUNC_INT = 287,                /* FUNC_INT  */
-    FUNC_DOUBLE = 288,             /* FUNC_DOUBLE  */
-    FUNC_ROUND = 289,              /* FUNC_ROUND  */
-    EQ = 290,                      /* EQ  */
-    NE = 291,                      /* NE  */
-    LT = 292,                      /* LT  */
-    GT = 293,                      /* GT  */
-    LE = 294,                      /* LE  */
-    GE = 295,                      /* GE  */
-    STREQ = 296,                   /* STREQ  */
-    STRNE = 297,                   /* STRNE  */
-    AND = 298,                     /* AND  */
-    OR = 299,                      /* OR  */
-    NOT = 300,                     /* NOT  */
-    PLUS = 301,                    /* PLUS  */
-    MINUS = 302,                   /* MINUS  */
-    MULT = 303,                    /* MULT  */
-    DIV = 304,                     /* DIV  */
-    MOD = 305,                     /* MOD  */
-    POW = 306,                     /* POW  */
-    BITAND = 307,                  /* BITAND  */
-    BITOR = 308,                   /* BITOR  */
-    BITXOR = 309,                  /* BITXOR  */
-    BITNOT = 310,                  /* BITNOT  */
-    LSHIFT = 311,                  /* LSHIFT  */
-    RSHIFT = 312,                  /* RSHIFT  */
-    ASSIGN = 313,                  /* ASSIGN  */
-    DOLLAR = 314,                  /* DOLLAR  */
-    LPAREN = 315,                  /* LPAREN  */
-    RPAREN = 316,                  /* RPAREN  */
-    SEMICOLON = 317,               /* SEMICOLON  */
-    COMMA = 318,                   /* COMMA  */
-    DOT = 319,                     /* DOT  */
-    COLON = 320,                   /* COLON  */
-    LBRACE = 321,                  /* LBRACE  */
-    RBRACE = 322,                  /* RBRACE  */
-    NEWLINE = 323,                 /* NEWLINE  */
-    ERROR = 324,                   /* ERROR  */
-    CASE = 325,                    /* CASE  */
-    DEFAULT = 326,                 /* DEFAULT  */
-    UNARY_MINUS = 327              /* UNARY_MINUS  */
+    BRACED_EXPR = 265,             /* BRACED_EXPR  */
+    IF = 266,                      /* IF  */
+    ELSE = 267,                    /* ELSE  */
+    ELSEIF = 268,                  /* ELSEIF  */
+    WHILE = 269,                   /* WHILE  */
+    FOR = 270,                     /* FOR  */
+    FOREACH = 271,                 /* FOREACH  */
+    PROC = 272,                    /* PROC  */
+    RETURN = 273,                  /* RETURN  */
+    SET = 274,                     /* SET  */
+    EXPR = 275,                    /* EXPR  */
+    SWITCH = 276,                  /* SWITCH  */
+    BREAK = 277,                   /* BREAK  */
+    CONTINUE = 278,                /* CONTINUE  */
+    IN = 279,                      /* IN  */
+    EQ = 280,                      /* EQ  */
+    NE = 281,                      /* NE  */
+    LT = 282,                      /* LT  */
+    GT = 283,                      /* GT  */
+    LE = 284,                      /* LE  */
+    GE = 285,                      /* GE  */
+    STREQ = 286,                   /* STREQ  */
+    STRNE = 287,                   /* STRNE  */
+    AND = 288,                     /* AND  */
+    OR = 289,                      /* OR  */
+    NOT = 290,                     /* NOT  */
+    PLUS = 291,                    /* PLUS  */
+    MINUS = 292,                   /* MINUS  */
+    MULT = 293,                    /* MULT  */
+    DIV = 294,                     /* DIV  */
+    MOD = 295,                     /* MOD  */
+    POW = 296,                     /* POW  */
+    BITAND = 297,                  /* BITAND  */
+    BITOR = 298,                   /* BITOR  */
+    BITXOR = 299,                  /* BITXOR  */
+    BITNOT = 300,                  /* BITNOT  */
+    LSHIFT = 301,                  /* LSHIFT  */
+    RSHIFT = 302,                  /* RSHIFT  */
+    ASSIGN = 303,                  /* ASSIGN  */
+    DOLLAR = 304,                  /* DOLLAR  */
+    LPAREN = 305,                  /* LPAREN  */
+    RPAREN = 306,                  /* RPAREN  */
+    SEMICOLON = 307,               /* SEMICOLON  */
+    COMMA = 308,                   /* COMMA  */
+    DOT = 309,                     /* DOT  */
+    COLON = 310,                   /* COLON  */
+    LBRACE = 311,                  /* LBRACE  */
+    RBRACE = 312,                  /* RBRACE  */
+    NEWLINE = 313,                 /* NEWLINE  */
+    ERROR = 314,                   /* ERROR  */
+    CASE = 315,                    /* CASE  */
+    DEFAULT = 316,                 /* DEFAULT  */
+    UNARY_BITNOT = 317,            /* UNARY_BITNOT  */
+    UNARY_BITAND = 318,            /* UNARY_BITAND  */
+    UNARY_MINUS = 319,             /* UNARY_MINUS  */
+    UNARY_PLUS = 320,              /* UNARY_PLUS  */
+    LOWER_THAN_ELSE = 321          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -132,13 +126,20 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "parser.y"
+#line 22 "parser.y"
 
     int int_val;
     double double_val;
     char* string_val;
+    expr_struct* expr_un;
+    stmt_struct* stmt_un;
+    stmt_list_struct* stmt_list_un;
+    expr_list_struct* expr_list_un;
+    elsif_list_struct* elsif_list_un;
+    param_list_struct* param_list_un;
+    program_struct* program_un;
 
-#line 142 "parser.tab.h"
+#line 143 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

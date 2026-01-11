@@ -3,10 +3,9 @@
 #include <string.h>
 #include <math.h>
 
-/* Используем определения из parser.tab.h */
+#include "tree_nodes.h"
 #include "parser.tab.h"
 
-/* Функции для работы с бесконечностью и NaN */
 double get_infinity(void);
 double get_nan(void);
 int is_infinity(double x);
@@ -14,13 +13,9 @@ int is_nan(double x);
 
 extern int yylineno;
 
-/* Объявление функции лексера */
 int yylex(void);
 
-/* ОПРЕДЕЛЕНИЕ yylval - ДОБАВЬТЕ ЭТУ СТРОКУ */
-YYSTYPE yylval;
 
-/* Функция для получения имени токена */
 const char* get_token_name(int token) {
     switch (token) {
         case IF: return "IF";
@@ -38,18 +33,6 @@ const char* get_token_name(int token) {
         case CONTINUE: return "CONTINUE";
         
         case BOOLEAN: return "BOOLEAN";
-        
-        case FUNC_ABS: return "FUNC_ABS";
-        case FUNC_SIN: return "FUNC_SIN";
-        case FUNC_COS: return "FUNC_COS";
-        case FUNC_TAN: return "FUNC_TAN";
-        case FUNC_EXP: return "FUNC_EXP";
-        case FUNC_LOG: return "FUNC_LOG";
-        case FUNC_SQRT: return "FUNC_SQRT";
-        case FUNC_RAND: return "FUNC_RAND";
-        case FUNC_INT: return "FUNC_INT";
-        case FUNC_DOUBLE: return "FUNC_DOUBLE";
-        case FUNC_ROUND: return "FUNC_ROUND";
         
         case EQ: return "EQ";
         case NE: return "NE";
@@ -91,6 +74,7 @@ const char* get_token_name(int token) {
         case IN: return "IN";
         case CASE: return "CASE";
         case DEFAULT: return "DEFAULT";
+        case BRACED_EXPR: return "BRACED_EXPR"; 
         
         case INTEGER: return "INTEGER";
         case DOUBLE: return "DOUBLE";
@@ -117,12 +101,10 @@ int main(int argc, char* argv[]) {
     
     FILE* input_file = NULL;
     
-    /* Проверяем аргументы командной строки */
     if (argc > 1) {
         input_file = fopen(argv[1], "r");
         if (input_file) {
             printf("Reading from file: %s\n\n", argv[1]);
-            /* Перенаправляем stdin на файл */
             freopen(argv[1], "r", stdin);
         } else {
             fprintf(stderr, "Error: Cannot open file %s\n", argv[1]);
@@ -138,7 +120,6 @@ int main(int argc, char* argv[]) {
     while ((token = yylex()) != 0) {
         printf("Token %d: %s (code=%d)", ++token_count, get_token_name(token), token);
         
-        /* Вывод семантических значений */
         switch (token) {
             case INTEGER:
                 printf(", val=%d", yylval.int_val);
@@ -158,9 +139,9 @@ int main(int argc, char* argv[]) {
             case COMMAND:
             case VARIABLE:
             case IDENTIFIER:
+            case BRACED_EXPR: 
                 if (yylval.string_val) {
                     printf(", val=\"%s\"", yylval.string_val);
-                    /* Не освобождаем здесь - это сделает парсер */
                 }
                 break;
         }

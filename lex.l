@@ -3,19 +3,18 @@
 
 %{
 #define YY_NO_UNISTD_H
+#include "tree_nodes.h"
+#include "utils.h"
 #include "parser.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "utils.h"
 
 extern int in_control_context;
 void remove_underscores(char* str);
 int is_valid_number_format(const char* s);
 
-char string_buffer[1024];
-int brace_count = 0;
 %}
 
 DIGIT       [0-9]
@@ -25,9 +24,16 @@ BIN_DIGIT   [01]
 ID          [a-zA-Z_][a-zA-Z0-9_]*
 WHITESPACE  [ \t\r]
 
-%x DOUBLE_QUOTES BRACED_STRING BRACKETS
+%x DOUBLE_QUOTES BRACED_STRING BRACKETS CONTROL_BRACE
 
 %%
+%{
+
+int brace_count = 0;
+int control_brace_count = 0;
+char string_buffer[1024];
+
+%}
 
 {WHITESPACE}+   { /* skip whitespace */ }
 \n              { return NEWLINE; }
@@ -55,18 +61,6 @@ WHITESPACE  [ \t\r]
 "no"            { yylval.int_val = 0; return BOOLEAN; }
 "on"            { yylval.int_val = 1; return BOOLEAN; }
 "off"           { yylval.int_val = 0; return BOOLEAN; }
-
-"abs"           { return FUNC_ABS; }
-"sin"           { return FUNC_SIN; }
-"cos"           { return FUNC_COS; }
-"tan"           { return FUNC_TAN; }
-"exp"           { return FUNC_EXP; }
-"log"           { return FUNC_LOG; }
-"sqrt"          { return FUNC_SQRT; }
-"rand"          { return FUNC_RAND; }
-"int"           { return FUNC_INT; }
-"double"        { return FUNC_DOUBLE; }
-"round"         { return FUNC_ROUND; }
 
 "=="            { return EQ; }
 "!="            { return NE; }
@@ -181,8 +175,10 @@ WHITESPACE  [ \t\r]
 
 "{" {
     if (in_control_context) {
-        brace_count = 1;
-        return LBRACE;  // парсить как блок кода
+        // В управляющих конструкциях обрабатываем отдельно
+        control_brace_count = 1;
+        string_buffer[0] = '\0';
+        BEGIN(CONTROL_BRACE);
     } else {
         // Обычная braced-строка
         string_buffer[0] = '\0';
@@ -193,10 +189,8 @@ WHITESPACE  [ \t\r]
 
 "}" {
     if (in_control_context) {
-        brace_count--;
-        if (brace_count == 0) {
-            in_control_context = 0;
-        }
+        // Только для закрытия блока кода
+        in_control_context = 0;
         return RBRACE;
     } else {
         fprintf(stderr, "ERROR: unexpected '}'\n");
@@ -221,20 +215,16 @@ WHITESPACE  [ \t\r]
         case 'r': strcat(string_buffer, "\r"); break;
         case '\\': strcat(string_buffer, "\\"); break;
         case '"': strcat(string_buffer, "\""); break;
-		case 'u': {
-            // Проверяем, что за u идут 4 шестнадцатиричных символа
-            if (strlen(yytext) >= 6) { // uXXXX
+        case 'u': {
+            if (strlen(yytext) >= 6) {
                 char hex[5];
                 strncpy(hex, &yytext[2], 4);
-                hex[4] = '0'; // Завершаем строку
-
-                // Преобразуем шестнадцатиричное значение в символ
+                hex[4] = '0';
                 wchar_t unicode_char = (wchar_t)strtol(hex, NULL, 16);
-                // Преобразуем в строку и добавляем в buffer
                 char mb_char[4];
                 int len = wctomb(mb_char, unicode_char);
                 if (len > 0) {
-                    mb_char[len] = '0'; // Завершаем строку
+                    mb_char[len] = '0';
                     strcat(string_buffer, mb_char);
                 }
             }
@@ -245,7 +235,6 @@ WHITESPACE  [ \t\r]
 }
 
 <DOUBLE_QUOTES>\$[a-zA-Z_][a-zA-Z0-9_]* {
-    // переменные: просто копируем как текст
     strcat(string_buffer, yytext);
 }
 
@@ -283,6 +272,32 @@ WHITESPACE  [ \t\r]
 
 <BRACED_STRING><<EOF>> {
     fprintf(stderr, "ERROR: Unclosed braced string\n");
+    BEGIN(INITIAL);
+    return ERROR;
+}
+
+<CONTROL_BRACE>[^{}]+ {
+    strcat(string_buffer, yytext);
+}
+
+<CONTROL_BRACE>"{" {
+    control_brace_count++;
+    strcat(string_buffer, "{");
+}
+
+<CONTROL_BRACE>"}" {
+    control_brace_count--;
+    if (control_brace_count == 0) {
+        yylval.string_val = strdup(string_buffer);
+        BEGIN(INITIAL);
+        return BRACED_EXPR;  // Новый токен для выражений в фигурных скобках
+    } else {
+        strcat(string_buffer, "}");
+    }
+}
+
+<CONTROL_BRACE><<EOF>> {
+    fprintf(stderr, "ERROR: Unclosed control brace\n");
     BEGIN(INITIAL);
     return ERROR;
 }
@@ -359,9 +374,7 @@ void set_control_context(int ctx) {
 int is_valid_number_format(const char* s) {
     int len = strlen(s);
     if (len == 0) return 0;
-    // Нельзя начинать или заканчивать на _
     if (s[0] == '_' || s[len-1] == '_') return 0;
-    // Нельзя иметь __
     if (strstr(s, "__")) return 0;
     return 1;
 }

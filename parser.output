@@ -1,0 +1,1872 @@
+Terminals unused in grammar
+
+    EXPR
+    SWITCH
+    BITAND
+    BITOR
+    BITXOR
+    BITNOT
+    LSHIFT
+    RSHIFT
+    ASSIGN
+    DOLLAR
+    SEMICOLON
+    COLON
+    ERROR
+    CASE
+    DEFAULT
+
+
+State 11 conflicts: 2 reduce/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: %empty
+    2        | program top_level_statement NEWLINE
+
+    3 top_level_statement: proc_definition
+    4                    | statement
+
+    5 statement: control_statement
+    6          | assignment
+    7          | expr
+    8          | error
+
+    9 assignment: SET IDENTIFIER expr
+
+   10 expr: arithmetic_expr
+   11     | boolean_expr
+   12     | string_expr
+   13     | VARIABLE
+   14     | COMMAND
+   15     | brace_expr
+   16     | BRACED_EXPR
+
+   17 arithmetic_expr: INTEGER
+   18                | DOUBLE
+   19                | arithmetic_expr PLUS arithmetic_expr
+   20                | arithmetic_expr MINUS arithmetic_expr
+   21                | arithmetic_expr MULT arithmetic_expr
+   22                | arithmetic_expr DIV arithmetic_expr
+   23                | arithmetic_expr MOD arithmetic_expr
+   24                | arithmetic_expr POW arithmetic_expr
+   25                | MINUS arithmetic_expr
+   26                | PLUS arithmetic_expr
+   27                | LPAREN arithmetic_expr RPAREN
+
+   28 boolean_expr: BOOLEAN
+   29             | arithmetic_expr EQ arithmetic_expr
+   30             | arithmetic_expr NE arithmetic_expr
+   31             | arithmetic_expr LT arithmetic_expr
+   32             | arithmetic_expr GT arithmetic_expr
+   33             | arithmetic_expr LE arithmetic_expr
+   34             | arithmetic_expr GE arithmetic_expr
+   35             | string_expr STREQ string_expr
+   36             | string_expr STRNE string_expr
+   37             | boolean_expr AND boolean_expr
+   38             | boolean_expr OR boolean_expr
+   39             | NOT boolean_expr
+   40             | LPAREN boolean_expr RPAREN
+
+   41 string_expr: STRING
+   42            | IDENTIFIER
+   43            | string_expr DOT string_expr
+   44            | BRACED_EXPR
+
+   45 brace_expr: LBRACE expr RBRACE
+   46           | LBRACE RBRACE
+
+   47 control_statement: if_statement
+   48                  | while_statement
+   49                  | for_statement
+   50                  | foreach_statement
+   51                  | return_statement
+   52                  | break_statement
+   53                  | continue_statement
+
+   54 if_statement: IF boolean_expr block
+   55             | IF boolean_expr block ELSE block
+   56             | IF boolean_expr block elsif_list ELSE block
+
+   57 elsif_list: ELSEIF boolean_expr block
+   58           | elsif_list ELSEIF boolean_expr block
+
+   59 while_statement: WHILE boolean_expr block
+
+   60 for_statement: FOR BRACED_EXPR BRACED_EXPR BRACED_EXPR block
+
+   61 foreach_statement: FOREACH VARIABLE IN VARIABLE block
+
+   62 proc_definition: PROC IDENTIFIER LPAREN RPAREN block
+   63                | PROC IDENTIFIER LPAREN parameter_list RPAREN block
+
+   64 parameter_list: IDENTIFIER
+   65               | parameter_list COMMA IDENTIFIER
+
+   66 return_statement: RETURN expr
+   67                 | RETURN
+
+   68 break_statement: BREAK
+
+   69 continue_statement: CONTINUE
+
+   70 block: LBRACE block_body RBRACE
+
+   71 block_body: %empty
+   72           | block_body statement NEWLINE
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256) 8
+    INTEGER <int_val> (258) 17
+    BOOLEAN <int_val> (259) 28
+    DOUBLE <double_val> (260) 18
+    STRING <string_val> (261) 41
+    COMMAND <string_val> (262) 14
+    VARIABLE <string_val> (263) 13 61
+    IDENTIFIER <string_val> (264) 9 42 62 63 64 65
+    BRACED_EXPR <string_val> (265) 16 44 60
+    IF (266) 54 55 56
+    ELSE (267) 55 56
+    ELSEIF (268) 57 58
+    WHILE (269) 59
+    FOR (270) 60
+    FOREACH (271) 61
+    PROC (272) 62 63
+    RETURN (273) 66 67
+    SET (274) 9
+    EXPR (275)
+    SWITCH (276)
+    BREAK (277) 68
+    CONTINUE (278) 69
+    IN (279) 61
+    EQ (280) 29
+    NE (281) 30
+    LT (282) 31
+    GT (283) 32
+    LE (284) 33
+    GE (285) 34
+    STREQ (286) 35
+    STRNE (287) 36
+    AND (288) 37
+    OR (289) 38
+    NOT (290) 39
+    PLUS (291) 19 26
+    MINUS (292) 20 25
+    MULT (293) 21
+    DIV (294) 22
+    MOD (295) 23
+    POW (296) 24
+    BITAND (297)
+    BITOR (298)
+    BITXOR (299)
+    BITNOT (300)
+    LSHIFT (301)
+    RSHIFT (302)
+    ASSIGN (303)
+    DOLLAR (304)
+    LPAREN (305) 27 40 62 63
+    RPAREN (306) 27 40 62 63
+    SEMICOLON (307)
+    COMMA (308) 65
+    DOT (309) 43
+    COLON (310)
+    LBRACE (311) 45 46 70
+    RBRACE (312) 45 46 70
+    NEWLINE (313) 2 72
+    ERROR (314)
+    CASE (315)
+    DEFAULT (316)
+    UNARY_MINUS (317)
+    UNARY_PLUS (318)
+    LOWER_THAN_ELSE (319)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (65)
+        on left: 0
+    program <stmt_list_un> (66)
+        on left: 1 2
+        on right: 0 2
+    top_level_statement <stmt_un> (67)
+        on left: 3 4
+        on right: 2
+    statement <stmt_un> (68)
+        on left: 5 6 7 8
+        on right: 4 72
+    assignment <stmt_un> (69)
+        on left: 9
+        on right: 6
+    expr <expr_un> (70)
+        on left: 10 11 12 13 14 15 16
+        on right: 7 9 45 66
+    arithmetic_expr <expr_un> (71)
+        on left: 17 18 19 20 21 22 23 24 25 26 27
+        on right: 10 19 20 21 22 23 24 25 26 27 29 30 31 32 33 34
+    boolean_expr <expr_un> (72)
+        on left: 28 29 30 31 32 33 34 35 36 37 38 39 40
+        on right: 11 37 38 39 40 54 55 56 57 58 59
+    string_expr <expr_un> (73)
+        on left: 41 42 43 44
+        on right: 12 35 36 43
+    brace_expr <expr_un> (74)
+        on left: 45 46
+        on right: 15
+    control_statement <stmt_un> (75)
+        on left: 47 48 49 50 51 52 53
+        on right: 5
+    if_statement <stmt_un> (76)
+        on left: 54 55 56
+        on right: 47
+    elsif_list <elsif_list_un> (77)
+        on left: 57 58
+        on right: 56 58
+    while_statement <stmt_un> (78)
+        on left: 59
+        on right: 48
+    for_statement <stmt_un> (79)
+        on left: 60
+        on right: 49
+    foreach_statement <stmt_un> (80)
+        on left: 61
+        on right: 50
+    proc_definition <stmt_un> (81)
+        on left: 62 63
+        on right: 3
+    parameter_list <param_list_un> (82)
+        on left: 64 65
+        on right: 63 65
+    return_statement <stmt_un> (83)
+        on left: 66 67
+        on right: 51
+    break_statement <stmt_un> (84)
+        on left: 68
+        on right: 52
+    continue_statement <stmt_un> (85)
+        on left: 69
+        on right: 53
+    block <stmt_list_un> (86)
+        on left: 70
+        on right: 54 55 56 57 58 59 60 61 62 63
+    block_body <stmt_list_un> (87)
+        on left: 71 72
+        on right: 70 72
+
+
+State 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 1
+
+
+State 1
+
+    0 $accept: program . $end
+    2 program: program . top_level_statement NEWLINE
+
+    $end         shift, and go to state 2
+    error        shift, and go to state 3
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    COMMAND      shift, and go to state 8
+    VARIABLE     shift, and go to state 9
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 11
+    IF           shift, and go to state 12
+    WHILE        shift, and go to state 13
+    FOR          shift, and go to state 14
+    FOREACH      shift, and go to state 15
+    PROC         shift, and go to state 16
+    RETURN       shift, and go to state 17
+    SET          shift, and go to state 18
+    BREAK        shift, and go to state 19
+    CONTINUE     shift, and go to state 20
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+    LBRACE       shift, and go to state 25
+
+    top_level_statement  go to state 26
+    statement            go to state 27
+    assignment           go to state 28
+    expr                 go to state 29
+    arithmetic_expr      go to state 30
+    boolean_expr         go to state 31
+    string_expr          go to state 32
+    brace_expr           go to state 33
+    control_statement    go to state 34
+    if_statement         go to state 35
+    while_statement      go to state 36
+    for_statement        go to state 37
+    foreach_statement    go to state 38
+    proc_definition      go to state 39
+    return_statement     go to state 40
+    break_statement      go to state 41
+    continue_statement   go to state 42
+
+
+State 2
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 3
+
+    8 statement: error .
+
+    $default  reduce using rule 8 (statement)
+
+
+State 4
+
+   17 arithmetic_expr: INTEGER .
+
+    $default  reduce using rule 17 (arithmetic_expr)
+
+
+State 5
+
+   28 boolean_expr: BOOLEAN .
+
+    $default  reduce using rule 28 (boolean_expr)
+
+
+State 6
+
+   18 arithmetic_expr: DOUBLE .
+
+    $default  reduce using rule 18 (arithmetic_expr)
+
+
+State 7
+
+   41 string_expr: STRING .
+
+    $default  reduce using rule 41 (string_expr)
+
+
+State 8
+
+   14 expr: COMMAND .
+
+    $default  reduce using rule 14 (expr)
+
+
+State 9
+
+   13 expr: VARIABLE .
+
+    $default  reduce using rule 13 (expr)
+
+
+State 10
+
+   42 string_expr: IDENTIFIER .
+
+    $default  reduce using rule 42 (string_expr)
+
+
+State 11
+
+   16 expr: BRACED_EXPR .
+   44 string_expr: BRACED_EXPR .
+
+    RBRACE    reduce using rule 16 (expr)
+    RBRACE    [reduce using rule 44 (string_expr)]
+    NEWLINE   reduce using rule 16 (expr)
+    NEWLINE   [reduce using rule 44 (string_expr)]
+    $default  reduce using rule 44 (string_expr)
+
+
+State 12
+
+   54 if_statement: IF . boolean_expr block
+   55             | IF . boolean_expr block ELSE block
+   56             | IF . boolean_expr block elsif_list ELSE block
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 45
+    string_expr      go to state 46
+
+
+State 13
+
+   59 while_statement: WHILE . boolean_expr block
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 47
+    string_expr      go to state 46
+
+
+State 14
+
+   60 for_statement: FOR . BRACED_EXPR BRACED_EXPR BRACED_EXPR block
+
+    BRACED_EXPR  shift, and go to state 48
+
+
+State 15
+
+   61 foreach_statement: FOREACH . VARIABLE IN VARIABLE block
+
+    VARIABLE  shift, and go to state 49
+
+
+State 16
+
+   62 proc_definition: PROC . IDENTIFIER LPAREN RPAREN block
+   63                | PROC . IDENTIFIER LPAREN parameter_list RPAREN block
+
+    IDENTIFIER  shift, and go to state 50
+
+
+State 17
+
+   66 return_statement: RETURN . expr
+   67                 | RETURN .
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    COMMAND      shift, and go to state 8
+    VARIABLE     shift, and go to state 9
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 11
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+    LBRACE       shift, and go to state 25
+
+    $default  reduce using rule 67 (return_statement)
+
+    expr             go to state 51
+    arithmetic_expr  go to state 30
+    boolean_expr     go to state 31
+    string_expr      go to state 32
+    brace_expr       go to state 33
+
+
+State 18
+
+    9 assignment: SET . IDENTIFIER expr
+
+    IDENTIFIER  shift, and go to state 52
+
+
+State 19
+
+   68 break_statement: BREAK .
+
+    $default  reduce using rule 68 (break_statement)
+
+
+State 20
+
+   69 continue_statement: CONTINUE .
+
+    $default  reduce using rule 69 (continue_statement)
+
+
+State 21
+
+   39 boolean_expr: NOT . boolean_expr
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 53
+    string_expr      go to state 46
+
+
+State 22
+
+   26 arithmetic_expr: PLUS . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 55
+
+
+State 23
+
+   25 arithmetic_expr: MINUS . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 56
+
+
+State 24
+
+   27 arithmetic_expr: LPAREN . arithmetic_expr RPAREN
+   40 boolean_expr: LPAREN . boolean_expr RPAREN
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 57
+    boolean_expr     go to state 58
+    string_expr      go to state 46
+
+
+State 25
+
+   45 brace_expr: LBRACE . expr RBRACE
+   46           | LBRACE . RBRACE
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    COMMAND      shift, and go to state 8
+    VARIABLE     shift, and go to state 9
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 11
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+    LBRACE       shift, and go to state 25
+    RBRACE       shift, and go to state 59
+
+    expr             go to state 60
+    arithmetic_expr  go to state 30
+    boolean_expr     go to state 31
+    string_expr      go to state 32
+    brace_expr       go to state 33
+
+
+State 26
+
+    2 program: program top_level_statement . NEWLINE
+
+    NEWLINE  shift, and go to state 61
+
+
+State 27
+
+    4 top_level_statement: statement .
+
+    $default  reduce using rule 4 (top_level_statement)
+
+
+State 28
+
+    6 statement: assignment .
+
+    $default  reduce using rule 6 (statement)
+
+
+State 29
+
+    7 statement: expr .
+
+    $default  reduce using rule 7 (statement)
+
+
+State 30
+
+   10 expr: arithmetic_expr .
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   29 boolean_expr: arithmetic_expr . EQ arithmetic_expr
+   30             | arithmetic_expr . NE arithmetic_expr
+   31             | arithmetic_expr . LT arithmetic_expr
+   32             | arithmetic_expr . GT arithmetic_expr
+   33             | arithmetic_expr . LE arithmetic_expr
+   34             | arithmetic_expr . GE arithmetic_expr
+
+    EQ     shift, and go to state 62
+    NE     shift, and go to state 63
+    LT     shift, and go to state 64
+    GT     shift, and go to state 65
+    LE     shift, and go to state 66
+    GE     shift, and go to state 67
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 10 (expr)
+
+
+State 31
+
+   11 expr: boolean_expr .
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+
+    AND  shift, and go to state 74
+    OR   shift, and go to state 75
+
+    $default  reduce using rule 11 (expr)
+
+
+State 32
+
+   12 expr: string_expr .
+   35 boolean_expr: string_expr . STREQ string_expr
+   36             | string_expr . STRNE string_expr
+   43 string_expr: string_expr . DOT string_expr
+
+    STREQ  shift, and go to state 76
+    STRNE  shift, and go to state 77
+    DOT    shift, and go to state 78
+
+    $default  reduce using rule 12 (expr)
+
+
+State 33
+
+   15 expr: brace_expr .
+
+    $default  reduce using rule 15 (expr)
+
+
+State 34
+
+    5 statement: control_statement .
+
+    $default  reduce using rule 5 (statement)
+
+
+State 35
+
+   47 control_statement: if_statement .
+
+    $default  reduce using rule 47 (control_statement)
+
+
+State 36
+
+   48 control_statement: while_statement .
+
+    $default  reduce using rule 48 (control_statement)
+
+
+State 37
+
+   49 control_statement: for_statement .
+
+    $default  reduce using rule 49 (control_statement)
+
+
+State 38
+
+   50 control_statement: foreach_statement .
+
+    $default  reduce using rule 50 (control_statement)
+
+
+State 39
+
+    3 top_level_statement: proc_definition .
+
+    $default  reduce using rule 3 (top_level_statement)
+
+
+State 40
+
+   51 control_statement: return_statement .
+
+    $default  reduce using rule 51 (control_statement)
+
+
+State 41
+
+   52 control_statement: break_statement .
+
+    $default  reduce using rule 52 (control_statement)
+
+
+State 42
+
+   53 control_statement: continue_statement .
+
+    $default  reduce using rule 53 (control_statement)
+
+
+State 43
+
+   44 string_expr: BRACED_EXPR .
+
+    $default  reduce using rule 44 (string_expr)
+
+
+State 44
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   29 boolean_expr: arithmetic_expr . EQ arithmetic_expr
+   30             | arithmetic_expr . NE arithmetic_expr
+   31             | arithmetic_expr . LT arithmetic_expr
+   32             | arithmetic_expr . GT arithmetic_expr
+   33             | arithmetic_expr . LE arithmetic_expr
+   34             | arithmetic_expr . GE arithmetic_expr
+
+    EQ     shift, and go to state 62
+    NE     shift, and go to state 63
+    LT     shift, and go to state 64
+    GT     shift, and go to state 65
+    LE     shift, and go to state 66
+    GE     shift, and go to state 67
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+
+State 45
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   54 if_statement: IF boolean_expr . block
+   55             | IF boolean_expr . block ELSE block
+   56             | IF boolean_expr . block elsif_list ELSE block
+
+    AND     shift, and go to state 74
+    OR      shift, and go to state 75
+    LBRACE  shift, and go to state 79
+
+    block  go to state 80
+
+
+State 46
+
+   35 boolean_expr: string_expr . STREQ string_expr
+   36             | string_expr . STRNE string_expr
+   43 string_expr: string_expr . DOT string_expr
+
+    STREQ  shift, and go to state 76
+    STRNE  shift, and go to state 77
+    DOT    shift, and go to state 78
+
+
+State 47
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   59 while_statement: WHILE boolean_expr . block
+
+    AND     shift, and go to state 74
+    OR      shift, and go to state 75
+    LBRACE  shift, and go to state 79
+
+    block  go to state 81
+
+
+State 48
+
+   60 for_statement: FOR BRACED_EXPR . BRACED_EXPR BRACED_EXPR block
+
+    BRACED_EXPR  shift, and go to state 82
+
+
+State 49
+
+   61 foreach_statement: FOREACH VARIABLE . IN VARIABLE block
+
+    IN  shift, and go to state 83
+
+
+State 50
+
+   62 proc_definition: PROC IDENTIFIER . LPAREN RPAREN block
+   63                | PROC IDENTIFIER . LPAREN parameter_list RPAREN block
+
+    LPAREN  shift, and go to state 84
+
+
+State 51
+
+   66 return_statement: RETURN expr .
+
+    $default  reduce using rule 66 (return_statement)
+
+
+State 52
+
+    9 assignment: SET IDENTIFIER . expr
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    COMMAND      shift, and go to state 8
+    VARIABLE     shift, and go to state 9
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 11
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+    LBRACE       shift, and go to state 25
+
+    expr             go to state 85
+    arithmetic_expr  go to state 30
+    boolean_expr     go to state 31
+    string_expr      go to state 32
+    brace_expr       go to state 33
+
+
+State 53
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   39             | NOT boolean_expr .
+
+    $default  reduce using rule 39 (boolean_expr)
+
+
+State 54
+
+   27 arithmetic_expr: LPAREN . arithmetic_expr RPAREN
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 86
+
+
+State 55
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   26                | PLUS arithmetic_expr .
+
+    $default  reduce using rule 26 (arithmetic_expr)
+
+
+State 56
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   25                | MINUS arithmetic_expr .
+
+    $default  reduce using rule 25 (arithmetic_expr)
+
+
+State 57
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   27                | LPAREN arithmetic_expr . RPAREN
+   29 boolean_expr: arithmetic_expr . EQ arithmetic_expr
+   30             | arithmetic_expr . NE arithmetic_expr
+   31             | arithmetic_expr . LT arithmetic_expr
+   32             | arithmetic_expr . GT arithmetic_expr
+   33             | arithmetic_expr . LE arithmetic_expr
+   34             | arithmetic_expr . GE arithmetic_expr
+
+    EQ      shift, and go to state 62
+    NE      shift, and go to state 63
+    LT      shift, and go to state 64
+    GT      shift, and go to state 65
+    LE      shift, and go to state 66
+    GE      shift, and go to state 67
+    PLUS    shift, and go to state 68
+    MINUS   shift, and go to state 69
+    MULT    shift, and go to state 70
+    DIV     shift, and go to state 71
+    MOD     shift, and go to state 72
+    POW     shift, and go to state 73
+    RPAREN  shift, and go to state 87
+
+
+State 58
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   40             | LPAREN boolean_expr . RPAREN
+
+    AND     shift, and go to state 74
+    OR      shift, and go to state 75
+    RPAREN  shift, and go to state 88
+
+
+State 59
+
+   46 brace_expr: LBRACE RBRACE .
+
+    $default  reduce using rule 46 (brace_expr)
+
+
+State 60
+
+   45 brace_expr: LBRACE expr . RBRACE
+
+    RBRACE  shift, and go to state 89
+
+
+State 61
+
+    2 program: program top_level_statement NEWLINE .
+
+    $default  reduce using rule 2 (program)
+
+
+State 62
+
+   29 boolean_expr: arithmetic_expr EQ . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 90
+
+
+State 63
+
+   30 boolean_expr: arithmetic_expr NE . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 91
+
+
+State 64
+
+   31 boolean_expr: arithmetic_expr LT . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 92
+
+
+State 65
+
+   32 boolean_expr: arithmetic_expr GT . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 93
+
+
+State 66
+
+   33 boolean_expr: arithmetic_expr LE . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 94
+
+
+State 67
+
+   34 boolean_expr: arithmetic_expr GE . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 95
+
+
+State 68
+
+   19 arithmetic_expr: arithmetic_expr PLUS . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 96
+
+
+State 69
+
+   20 arithmetic_expr: arithmetic_expr MINUS . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 97
+
+
+State 70
+
+   21 arithmetic_expr: arithmetic_expr MULT . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 98
+
+
+State 71
+
+   22 arithmetic_expr: arithmetic_expr DIV . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 99
+
+
+State 72
+
+   23 arithmetic_expr: arithmetic_expr MOD . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 100
+
+
+State 73
+
+   24 arithmetic_expr: arithmetic_expr POW . arithmetic_expr
+
+    INTEGER  shift, and go to state 4
+    DOUBLE   shift, and go to state 6
+    PLUS     shift, and go to state 22
+    MINUS    shift, and go to state 23
+    LPAREN   shift, and go to state 54
+
+    arithmetic_expr  go to state 101
+
+
+State 74
+
+   37 boolean_expr: boolean_expr AND . boolean_expr
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 102
+    string_expr      go to state 46
+
+
+State 75
+
+   38 boolean_expr: boolean_expr OR . boolean_expr
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 103
+    string_expr      go to state 46
+
+
+State 76
+
+   35 boolean_expr: string_expr STREQ . string_expr
+
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+
+    string_expr  go to state 104
+
+
+State 77
+
+   36 boolean_expr: string_expr STRNE . string_expr
+
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+
+    string_expr  go to state 105
+
+
+State 78
+
+   43 string_expr: string_expr DOT . string_expr
+
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+
+    string_expr  go to state 106
+
+
+State 79
+
+   70 block: LBRACE . block_body RBRACE
+
+    $default  reduce using rule 71 (block_body)
+
+    block_body  go to state 107
+
+
+State 80
+
+   54 if_statement: IF boolean_expr block .
+   55             | IF boolean_expr block . ELSE block
+   56             | IF boolean_expr block . elsif_list ELSE block
+
+    ELSE    shift, and go to state 108
+    ELSEIF  shift, and go to state 109
+
+    $default  reduce using rule 54 (if_statement)
+
+    elsif_list  go to state 110
+
+
+State 81
+
+   59 while_statement: WHILE boolean_expr block .
+
+    $default  reduce using rule 59 (while_statement)
+
+
+State 82
+
+   60 for_statement: FOR BRACED_EXPR BRACED_EXPR . BRACED_EXPR block
+
+    BRACED_EXPR  shift, and go to state 111
+
+
+State 83
+
+   61 foreach_statement: FOREACH VARIABLE IN . VARIABLE block
+
+    VARIABLE  shift, and go to state 112
+
+
+State 84
+
+   62 proc_definition: PROC IDENTIFIER LPAREN . RPAREN block
+   63                | PROC IDENTIFIER LPAREN . parameter_list RPAREN block
+
+    IDENTIFIER  shift, and go to state 113
+    RPAREN      shift, and go to state 114
+
+    parameter_list  go to state 115
+
+
+State 85
+
+    9 assignment: SET IDENTIFIER expr .
+
+    $default  reduce using rule 9 (assignment)
+
+
+State 86
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   27                | LPAREN arithmetic_expr . RPAREN
+
+    PLUS    shift, and go to state 68
+    MINUS   shift, and go to state 69
+    MULT    shift, and go to state 70
+    DIV     shift, and go to state 71
+    MOD     shift, and go to state 72
+    POW     shift, and go to state 73
+    RPAREN  shift, and go to state 87
+
+
+State 87
+
+   27 arithmetic_expr: LPAREN arithmetic_expr RPAREN .
+
+    $default  reduce using rule 27 (arithmetic_expr)
+
+
+State 88
+
+   40 boolean_expr: LPAREN boolean_expr RPAREN .
+
+    $default  reduce using rule 40 (boolean_expr)
+
+
+State 89
+
+   45 brace_expr: LBRACE expr RBRACE .
+
+    $default  reduce using rule 45 (brace_expr)
+
+
+State 90
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   29 boolean_expr: arithmetic_expr EQ arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 29 (boolean_expr)
+
+
+State 91
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   30 boolean_expr: arithmetic_expr NE arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 30 (boolean_expr)
+
+
+State 92
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   31 boolean_expr: arithmetic_expr LT arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 31 (boolean_expr)
+
+
+State 93
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   32 boolean_expr: arithmetic_expr GT arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 32 (boolean_expr)
+
+
+State 94
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   33 boolean_expr: arithmetic_expr LE arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 33 (boolean_expr)
+
+
+State 95
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   34 boolean_expr: arithmetic_expr GE arithmetic_expr .
+
+    PLUS   shift, and go to state 68
+    MINUS  shift, and go to state 69
+    MULT   shift, and go to state 70
+    DIV    shift, and go to state 71
+    MOD    shift, and go to state 72
+    POW    shift, and go to state 73
+
+    $default  reduce using rule 34 (boolean_expr)
+
+
+State 96
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   19                | arithmetic_expr PLUS arithmetic_expr .
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+
+    MULT  shift, and go to state 70
+    DIV   shift, and go to state 71
+    MOD   shift, and go to state 72
+    POW   shift, and go to state 73
+
+    $default  reduce using rule 19 (arithmetic_expr)
+
+
+State 97
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   20                | arithmetic_expr MINUS arithmetic_expr .
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+
+    MULT  shift, and go to state 70
+    DIV   shift, and go to state 71
+    MOD   shift, and go to state 72
+    POW   shift, and go to state 73
+
+    $default  reduce using rule 20 (arithmetic_expr)
+
+
+State 98
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   21                | arithmetic_expr MULT arithmetic_expr .
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+
+    POW  shift, and go to state 73
+
+    $default  reduce using rule 21 (arithmetic_expr)
+
+
+State 99
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   22                | arithmetic_expr DIV arithmetic_expr .
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+
+    POW  shift, and go to state 73
+
+    $default  reduce using rule 22 (arithmetic_expr)
+
+
+State 100
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   23                | arithmetic_expr MOD arithmetic_expr .
+   24                | arithmetic_expr . POW arithmetic_expr
+
+    POW  shift, and go to state 73
+
+    $default  reduce using rule 23 (arithmetic_expr)
+
+
+State 101
+
+   19 arithmetic_expr: arithmetic_expr . PLUS arithmetic_expr
+   20                | arithmetic_expr . MINUS arithmetic_expr
+   21                | arithmetic_expr . MULT arithmetic_expr
+   22                | arithmetic_expr . DIV arithmetic_expr
+   23                | arithmetic_expr . MOD arithmetic_expr
+   24                | arithmetic_expr . POW arithmetic_expr
+   24                | arithmetic_expr POW arithmetic_expr .
+
+    POW  shift, and go to state 73
+
+    $default  reduce using rule 24 (arithmetic_expr)
+
+
+State 102
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   37             | boolean_expr AND boolean_expr .
+   38             | boolean_expr . OR boolean_expr
+
+    $default  reduce using rule 37 (boolean_expr)
+
+
+State 103
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   38             | boolean_expr OR boolean_expr .
+
+    AND  shift, and go to state 74
+
+    $default  reduce using rule 38 (boolean_expr)
+
+
+State 104
+
+   35 boolean_expr: string_expr STREQ string_expr .
+   43 string_expr: string_expr . DOT string_expr
+
+    DOT  shift, and go to state 78
+
+    $default  reduce using rule 35 (boolean_expr)
+
+
+State 105
+
+   36 boolean_expr: string_expr STRNE string_expr .
+   43 string_expr: string_expr . DOT string_expr
+
+    DOT  shift, and go to state 78
+
+    $default  reduce using rule 36 (boolean_expr)
+
+
+State 106
+
+   43 string_expr: string_expr . DOT string_expr
+   43            | string_expr DOT string_expr .
+
+    $default  reduce using rule 43 (string_expr)
+
+
+State 107
+
+   70 block: LBRACE block_body . RBRACE
+   72 block_body: block_body . statement NEWLINE
+
+    error        shift, and go to state 3
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    COMMAND      shift, and go to state 8
+    VARIABLE     shift, and go to state 9
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 11
+    IF           shift, and go to state 12
+    WHILE        shift, and go to state 13
+    FOR          shift, and go to state 14
+    FOREACH      shift, and go to state 15
+    RETURN       shift, and go to state 17
+    SET          shift, and go to state 18
+    BREAK        shift, and go to state 19
+    CONTINUE     shift, and go to state 20
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+    LBRACE       shift, and go to state 25
+    RBRACE       shift, and go to state 116
+
+    statement           go to state 117
+    assignment          go to state 28
+    expr                go to state 29
+    arithmetic_expr     go to state 30
+    boolean_expr        go to state 31
+    string_expr         go to state 32
+    brace_expr          go to state 33
+    control_statement   go to state 34
+    if_statement        go to state 35
+    while_statement     go to state 36
+    for_statement       go to state 37
+    foreach_statement   go to state 38
+    return_statement    go to state 40
+    break_statement     go to state 41
+    continue_statement  go to state 42
+
+
+State 108
+
+   55 if_statement: IF boolean_expr block ELSE . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 118
+
+
+State 109
+
+   57 elsif_list: ELSEIF . boolean_expr block
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 119
+    string_expr      go to state 46
+
+
+State 110
+
+   56 if_statement: IF boolean_expr block elsif_list . ELSE block
+   58 elsif_list: elsif_list . ELSEIF boolean_expr block
+
+    ELSE    shift, and go to state 120
+    ELSEIF  shift, and go to state 121
+
+
+State 111
+
+   60 for_statement: FOR BRACED_EXPR BRACED_EXPR BRACED_EXPR . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 122
+
+
+State 112
+
+   61 foreach_statement: FOREACH VARIABLE IN VARIABLE . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 123
+
+
+State 113
+
+   64 parameter_list: IDENTIFIER .
+
+    $default  reduce using rule 64 (parameter_list)
+
+
+State 114
+
+   62 proc_definition: PROC IDENTIFIER LPAREN RPAREN . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 124
+
+
+State 115
+
+   63 proc_definition: PROC IDENTIFIER LPAREN parameter_list . RPAREN block
+   65 parameter_list: parameter_list . COMMA IDENTIFIER
+
+    RPAREN  shift, and go to state 125
+    COMMA   shift, and go to state 126
+
+
+State 116
+
+   70 block: LBRACE block_body RBRACE .
+
+    $default  reduce using rule 70 (block)
+
+
+State 117
+
+   72 block_body: block_body statement . NEWLINE
+
+    NEWLINE  shift, and go to state 127
+
+
+State 118
+
+   55 if_statement: IF boolean_expr block ELSE block .
+
+    $default  reduce using rule 55 (if_statement)
+
+
+State 119
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   57 elsif_list: ELSEIF boolean_expr . block
+
+    AND     shift, and go to state 74
+    OR      shift, and go to state 75
+    LBRACE  shift, and go to state 79
+
+    block  go to state 128
+
+
+State 120
+
+   56 if_statement: IF boolean_expr block elsif_list ELSE . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 129
+
+
+State 121
+
+   58 elsif_list: elsif_list ELSEIF . boolean_expr block
+
+    INTEGER      shift, and go to state 4
+    BOOLEAN      shift, and go to state 5
+    DOUBLE       shift, and go to state 6
+    STRING       shift, and go to state 7
+    IDENTIFIER   shift, and go to state 10
+    BRACED_EXPR  shift, and go to state 43
+    NOT          shift, and go to state 21
+    PLUS         shift, and go to state 22
+    MINUS        shift, and go to state 23
+    LPAREN       shift, and go to state 24
+
+    arithmetic_expr  go to state 44
+    boolean_expr     go to state 130
+    string_expr      go to state 46
+
+
+State 122
+
+   60 for_statement: FOR BRACED_EXPR BRACED_EXPR BRACED_EXPR block .
+
+    $default  reduce using rule 60 (for_statement)
+
+
+State 123
+
+   61 foreach_statement: FOREACH VARIABLE IN VARIABLE block .
+
+    $default  reduce using rule 61 (foreach_statement)
+
+
+State 124
+
+   62 proc_definition: PROC IDENTIFIER LPAREN RPAREN block .
+
+    $default  reduce using rule 62 (proc_definition)
+
+
+State 125
+
+   63 proc_definition: PROC IDENTIFIER LPAREN parameter_list RPAREN . block
+
+    LBRACE  shift, and go to state 79
+
+    block  go to state 131
+
+
+State 126
+
+   65 parameter_list: parameter_list COMMA . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 132
+
+
+State 127
+
+   72 block_body: block_body statement NEWLINE .
+
+    $default  reduce using rule 72 (block_body)
+
+
+State 128
+
+   57 elsif_list: ELSEIF boolean_expr block .
+
+    $default  reduce using rule 57 (elsif_list)
+
+
+State 129
+
+   56 if_statement: IF boolean_expr block elsif_list ELSE block .
+
+    $default  reduce using rule 56 (if_statement)
+
+
+State 130
+
+   37 boolean_expr: boolean_expr . AND boolean_expr
+   38             | boolean_expr . OR boolean_expr
+   58 elsif_list: elsif_list ELSEIF boolean_expr . block
+
+    AND     shift, and go to state 74
+    OR      shift, and go to state 75
+    LBRACE  shift, and go to state 79
+
+    block  go to state 133
+
+
+State 131
+
+   63 proc_definition: PROC IDENTIFIER LPAREN parameter_list RPAREN block .
+
+    $default  reduce using rule 63 (proc_definition)
+
+
+State 132
+
+   65 parameter_list: parameter_list COMMA IDENTIFIER .
+
+    $default  reduce using rule 65 (parameter_list)
+
+
+State 133
+
+   58 elsif_list: elsif_list ELSEIF boolean_expr block .
+
+    $default  reduce using rule 58 (elsif_list)
